@@ -67,6 +67,8 @@ class GoBackendService : Service() {
             dataDir.mkdirs()
         }
 
+        BackendSettingsSeeder.seed(this, dataDir)
+
         val socketPath = File(filesDir, "backend.sock").absolutePath
         val cmd = arrayOf(
             binaryPath,

@@ -63,14 +63,11 @@ class SettingsRepository(private val context: Context) {
     fun initFirstLaunchIfNeeded() {
         executor.execute {
             try {
-                val incompleteDir = File(context.getExternalFilesDir(null), "FriendNet/.incomplete")
                 val completeDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                val incompleteDir = File(completeDir, ".friendnet-incomplete")
 
                 incompleteDir.mkdirs()
                 completeDir.mkdirs()
-
-                val alreadyApplied = prefs.getString("complete_download_dir", null) == completeDir.absolutePath
-                if (alreadyApplied) return@execute
 
                 val settings = TransferSettings.newBuilder()
                     .setIncompleteDownloadDir(incompleteDir.absolutePath)
@@ -78,6 +75,8 @@ class SettingsRepository(private val context: Context) {
                     .setDownloadConcurrency(3)
                     .build()
 
+                // Always apply on launch so the backend's stored settings converge
+                // on the desired dirs (taking effect on the next backend start).
                 val request = UpdateTransferSettingsRequest.newBuilder()
                     .setSettings(settings)
                     .build()

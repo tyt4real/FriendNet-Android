@@ -3,4 +3,7 @@
     <external-path
         name="downloads"
         path="Download/" />
+    <files-path
+        name="backend_default_downloads"
+        path="Downloads/" />
 </paths>

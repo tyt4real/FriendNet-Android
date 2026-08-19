@@ -16,8 +16,7 @@ import net.tyt4.friendnet.R
 import net.tyt4.friendnet.databinding.FragmentDownloadsBinding
 import net.tyt4.friendnet.gen.DownloadManagerItem
 import net.tyt4.friendnet.repository.ServerRepository
-import net.tyt4.friendnet.repository.SettingsRepository
-import net.tyt4.friendnet.util.FilenameReplacer
+import net.tyt4.friendnet.util.DownloadPathResolver
 import java.io.File
 
 class DownloadsFragment : Fragment() {
@@ -114,9 +113,7 @@ class DownloadsFragment : Fragment() {
 
     private fun resolveDownloadedFile(item: DownloadManagerItem): File? {
         return try {
-            val completeDir = SettingsRepository(requireContext()).getCompleteDownloadDir()
-            val relative = FilenameReplacer.replacePath("${item.peerUsername}-${item.serverUuid}/${item.filePath}")
-            File(completeDir, relative)
+            DownloadPathResolver.resolve(requireContext(), item)
         } catch (e: Exception) {
             null
         }
