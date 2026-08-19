@@ -24,6 +24,12 @@
         tools:layout="@layout/fragment_downloads" />
 
     <fragment
+        android:id="@+id/navigation_logs"
+        android:name="net.tyt4.friendnet.ui.logs.LogsFragment"
+        android:label="Logs"
+        tools:layout="@layout/fragment_logs" />
+
+    <fragment
         android:id="@+id/navigation_settings"
         android:name="net.tyt4.friendnet.ui.settings.SettingsFragment"
         android:label="Settings"
