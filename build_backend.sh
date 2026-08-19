@@ -41,27 +41,6 @@ fi
 
 cd FriendNet
 
-# The upstream webserver only enables HTTP/2 over TLS (protos.SetHTTP2), not
-# cleartext h2c (protos.SetUnencryptedHTTP2). The app's gRPC client (OkHttp)
-# speaks HTTP/2 with prior knowledge over a plaintext unix socket, which
-# requires UnencryptedHTTP2. Apply a one-line transient patch for the build,
-# then restore the file so the submodule stays pristine.
-WEBSERVER_FILE="common/webserver/webserver.go"
-WEBSERVER_PATCHED=0
-if ! grep -q "SetUnencryptedHTTP2" "$WEBSERVER_FILE"; then
-    sed -i '/protos.SetHTTP1(true)/a\		protos.SetUnencryptedHTTP2(true)' "$WEBSERVER_FILE"
-    WEBSERVER_PATCHED=1
-    echo "Patched $WEBSERVER_FILE for cleartext h2c support"
-fi
-
-cleanup() {
-    if [ "$WEBSERVER_PATCHED" = "1" ]; then
-        git checkout -- "$WEBSERVER_FILE"
-        echo "Restored $WEBSERVER_FILE"
-    fi
-}
-trap cleanup EXIT
-
 build_arch() {
     local GOARCH=$1
     local ABI=$2
