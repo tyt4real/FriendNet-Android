@@ -1,0 +1,3 @@
+[submodule "FriendNet"]
+	path = FriendNet
+	url = https://github.com/termermc/FriendNet

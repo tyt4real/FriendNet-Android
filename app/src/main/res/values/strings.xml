@@ -1,0 +1,89 @@
+<resources>
+    <string name="app_name">FriendNet</string>
+
+    <string name="starting_backend">Starting backend…</string>
+    <string name="backend_connected">Backend connected</string>
+    <string name="failed_to_connect_retry">Failed to connect to backend. Tap to retry.</string>
+
+    <string name="tab_servers">Servers</string>
+    <string name="tab_browse">Browse</string>
+    <string name="tab_downloads">Downloads</string>
+    <string name="tab_settings">Settings</string>
+
+    <string name="servers_empty_title">No servers yet</string>
+    <string name="servers_empty_subtitle">Add a server to start sharing files with friends.</string>
+    <string name="add_server">Add Server</string>
+    <string name="edit_server">Edit Server</string>
+    <string name="server_name">Server Name</string>
+    <string name="server_address">Server Address (host:port)</string>
+    <string name="room">Room</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="storage_access_title">Allow access to all files</string>
+    <string name="storage_access_message">Downloads are saved to the public Downloads folder, which requires full file access. Grant it in Settings to enable downloads.</string>
+    <string name="storage_access_grant">Open Settings</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="delete_server_title">Delete server?</string>
+    <string name="delete_server_message">This will remove "%1$s" from your server list.</string>
+    <string name="server_created">Server added</string>
+    <string name="server_updated">Server updated</string>
+    <string name="server_deleted">Server deleted</string>
+    <string name="connect_requested">Connecting to %1$s…</string>
+    <string name="disconnect_requested">Disconnected from %1$s</string>
+    <string name="error_occurred">Something went wrong</string>
+    <string name="server_status_open">Connected</string>
+    <string name="server_status_opening">Connecting…</string>
+    <string name="server_status_closed">Disconnected</string>
+
+    <string name="select_server">Select server</string>
+    <string name="select_user">Select user</string>
+    <string name="no_servers_connected">No connected servers. Connect a server first.</string>
+    <string name="no_users_online">No users online</string>
+    <string name="folder_empty">This folder is empty</string>
+    <string name="browse_hint">Select a server and user to browse their files</string>
+    <string name="navigate_up">Go up one folder</string>
+    <string name="search">Search</string>
+    <string name="search_files">Search files</string>
+    <string name="search_hint">Search for files…</string>
+    <string name="search_empty">No results</string>
+    <string name="searching">Searching…</string>
+    <string name="folder">Folder</string>
+    <string name="bytes">bytes</string>
+    <string name="download">Download</string>
+    <string name="download_started">Download started</string>
+    <string name="download_file">Download file</string>
+    <string name="file_from_user">%1$s from %2$s</string>
+
+    <string name="download_status_queued">Queued</string>
+    <string name="download_status_pending">Downloading</string>
+    <string name="download_status_canceled">Canceled</string>
+    <string name="download_status_done">Done</string>
+    <string name="download_status_error">Error</string>
+    <string name="downloads_empty_title">No downloads</string>
+    <string name="downloads_empty_subtitle">Files you download will show up here.</string>
+    <string name="resume">Resume</string>
+    <string name="remove">Remove</string>
+    <string name="cancel_download">Cancel</string>
+    <string name="download_canceled">Download canceled</string>
+    <string name="open_file">Open</string>
+    <string name="download_file_missing">File no longer exists</string>
+    <string name="no_app_to_open_file">No app can open this file</string>
+    <string name="download_resumed">Download resumed</string>
+    <string name="download_removed">Download removed</string>
+
+    <string name="settings_transfer_title">Transfer Settings</string>
+    <string name="settings_incomplete_dir">Incomplete downloads: %1$s</string>
+    <string name="settings_complete_dir">Complete downloads: %1$s</string>
+    <string name="settings_update_title">Updates</string>
+    <string name="settings_check_update">Check for Updates</string>
+    <string name="settings_no_update">You are up to date.</string>
+    <string name="settings_new_update">New version %1$s is available</string>
+    <string name="settings_update_check_failed">Could not check for updates.</string>
+    <string name="settings_about_title">About</string>
+    <string name="settings_about_text">FriendNet is a peer-to-peer file sharing client. This app embeds the FriendNet client and exposes it through a simple mobile interface.</string>
+</resources>
