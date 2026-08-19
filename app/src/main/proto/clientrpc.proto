@@ -1,0 +1,910 @@
+syntax = "proto3";
+
+option go_package = "friendnet.org/protocol/clientrpc";
+
+package pb.clientrpc.v1;
+
+option java_package = "net.tyt4.friendnet.gen";
+option java_multiple_files = true;
+option java_outer_classname = "ClientRpcProto";
+
+
+// Event is an event.
+// Events are differentiated by type, and have different data based on that type.
+message Event {
+    enum Type {
+        // Do not use.
+        TYPE_UNSPECIFIED = 0;
+
+        // The client is stopping.
+        TYPE_STOP = 1;
+
+        // A server's connection state changed.
+        TYPE_SERVER_CONN_STATE_CHANGE = 2;
+
+        // A client went online.
+        TYPE_CLIENT_ONLINE = 3;
+
+        // A client went offline.
+        TYPE_CLIENT_OFFLINE = 4;
+
+        // A new update is available or the update checked was invalid.
+        TYPE_NEW_UPDATE = 5;
+
+        // Download status updates for files.
+        TYPE_DOWNLOAD_STATUS_UPDATES = 6;
+
+        // A new download manager item was added.
+        TYPE_NEW_DM_ITEM = 7;
+
+        // A download manager item was removed.
+        TYPE_DM_ITEM_REMOVED = 8;
+    }
+
+    message ServerConnStateChange {
+        // The server's new connection state.
+        ServerConnState state = 2;
+    }
+    message ClientOnline {
+        // The online user's info.
+        OnlineUserInfo info = 1;
+    }
+    message ClientOffline {
+        // The client's username.
+        string username = 1;
+    }
+    message NewUpdate {
+        // The new update's info.
+        UpdateInfo info = 1;
+    }
+    message DownloadStatusUpdates {
+        // The download progress info for files.
+        repeated DownloadStatusUpdate files = 1;
+    }
+    message NewDmItem {
+        // The download manager item.
+        DownloadManagerItem item = 1;
+    }
+    message DmItemRemoved {
+        // The item's UUID.
+        string uuid = 1;
+    }
+
+    // The event type.
+    // The appropriate field will be filled based on the type.
+    Type type = 1;
+
+    optional ServerConnStateChange server_conn = 2;
+    optional ClientOnline client_online = 3;
+    optional ClientOffline client_offline = 4;
+    optional NewUpdate new_update = 5;
+    optional DownloadStatusUpdates download_status_updates = 6;
+    optional NewDmItem new_dm_item = 7;
+    optional DmItemRemoved dm_item_removed = 8;
+}
+
+// EventContext is the context about where an event was generated.
+message EventContext {
+    // The UUID of the server where the event originated from.
+    string server_uuid = 1;
+}
+
+// LogMessageAttr is an attribute within a LogMessage.
+message LogMessageAttr {
+    // The value kind.
+    string kind = 1;
+
+    // The key.
+    string key = 2;
+
+    // The string representation of the value.
+    // The value can be interpreted based on the value of `kind`.
+    string value = 3;
+}
+
+// LogMessage is a structured log message.
+message LogMessage {
+    // The message's UID.
+    string uid = 1;
+
+    // The UNIX millisecond timestamp the log was sent on.
+    int64 created_ts = 2;
+
+    // The textual message.
+    string message = 3;
+
+    // The message's attributes.
+    repeated LogMessageAttr attrs = 4;
+}
+
+// DownloadStatus is the status of a file download.
+enum DownloadStatus {
+    // Do not use.
+    DOWNLOAD_STATUS_UNSPECIFIED = 0;
+
+    // Queued.
+    DOWNLOAD_STATUS_QUEUED = 1;
+
+    // Pending.
+    DOWNLOAD_STATUS_PENDING = 2;
+
+    // Canceled.
+    DOWNLOAD_STATUS_CANCELED = 3;
+
+    // Done.
+    DOWNLOAD_STATUS_DONE = 4;
+
+    // Failed to download due to an error.
+    DOWNLOAD_STATUS_ERROR = 5;
+}
+
+// DownloadStatusUpdate is a file download status update.
+message DownloadStatusUpdate {
+    // The file download's UUID.
+    string uuid = 1;
+
+    // The download status.
+    DownloadStatus status = 2;
+
+    // The number of bytes downloaded.
+    uint64 downloaded = 3;
+
+    // The file's size in bytes, if -1 if not yet known.
+    int64 file_size = 4;
+
+    // The current download speed, in bytes per second.
+    uint64 speed = 5;
+
+    // The error message, if applicable.
+    optional string error_message = 6;
+}
+
+// DownloadManagerItem is an item in the download manager.
+message DownloadManagerItem {
+    enum Type {
+        // Do not use.
+        TYPE_UNSPECIFIED = 0;
+
+        // A download.
+        TYPE_DOWNLOAD = 1;
+    }
+
+    message Download {
+        // The download status.
+        DownloadStatus status = 1;
+
+        // The number of bytes downloaded.
+        uint64 downloaded = 2;
+
+        // The file's size in bytes, or -1 if not yet known.
+        int64 file_size = 3;
+
+        // The error message, if applicable.
+        optional string error_message = 6;
+    }
+
+    // The item's type.
+    Type type = 1;
+
+    // The item's UUID.
+    string uuid = 2;
+
+    // The associated server's UUID.
+    string server_uuid = 3;
+
+    // The associated peer's username.
+    string peer_username = 4;
+
+    // The file's path.
+    string file_path = 5;
+
+    // A download item.
+    optional Download download = 6;
+}
+
+// Information about an update.
+message UpdateInfo {
+    // Whether the checked update was valid.
+    // If false, no other fields will be filled.
+    // An invalid update is caused by an invalid signature on an update,
+    // which is indicative of a larger problem.
+    bool is_valid = 1;
+
+    // The release timestamp.
+    int64 created_ts = 2;
+
+    // The version string.
+    string version = 3;
+
+    // The description.
+    string description = 4;
+
+    // The URL to get the update.
+    // It is not a URL to a binary, it is a URL to a page to get the binary.
+    string url = 5;
+}
+
+// ServerConnState is possible connection states for a server.
+enum ServerConnState {
+    // Do not use.
+    SERVER_CONN_STATE_UNSPECIFIED = 0;
+
+    // Closed.
+    SERVER_CONN_STATE_CLOSED = 1;
+
+    // Opening.
+    SERVER_CONN_STATE_OPENING = 2;
+
+    // Open.
+    SERVER_CONN_STATE_OPEN = 3;
+}
+
+// Information about a server.
+message ServerInfo {
+    message State {
+        // The current connection state.
+        ServerConnState conn_state = 1;
+    }
+
+    // The server's current state.
+    State state = 1;
+
+    // The server's UUID.
+    string uuid = 2;
+
+    // The name given to the server.
+    string name = 3;
+
+    // The server's address.
+    string address = 4;
+
+    // The room to connect to.
+    string room = 5;
+
+    // The username to use for authentication.
+    string username = 6;
+
+    // The UNIX timestamp when the server was created.
+    int64 created_ts = 7;
+}
+
+// Information about a server share.
+message ShareInfo {
+    // The share's UUID.
+    string uuid = 1;
+
+    // The UUID of the associated server.
+    string server_uuid = 2;
+
+    // The share's name.
+    string name = 3;
+
+    // The share's path on disk.
+    string path = 4;
+
+    // Whether links should be followed.
+    // Links are symbolic links or the OS equivalent.
+    bool follow_links = 5;
+
+    // The UNIX timestamp when the share was created.
+    int64 created_ts = 6;
+}
+
+// OnlineUserInfo is information about an online user.
+message OnlineUserInfo {
+    // The user's username.
+    string username = 1;
+}
+
+// FileMeta is metadata about a file/folder.
+message FileMeta {
+    // The file's name.
+    string name = 1;
+
+    // Whether the file is a directory.
+    bool is_dir = 2;
+
+    // The file's size, in bytes.
+    // Always zero if the file is a folder.
+    uint64 size = 3;
+}
+
+// DirectSettings is direct connection settings for the client.
+message DirectSettings {
+    // Whether to disable direct connections entirely.
+    // If true, all other fields will be ignored.
+    bool disable = 1;
+
+    // The initial addresses to listen on.
+    // Each address must be in the format `IPv4:PORT`, `[IPv6]:PORT`, `IP` (IPv6 without port does not need brackets).
+    // Must specify at least one.
+    // Can use addresses like `0.0.0.0` and `[::]` (with or without port) to listen on all interfaces.
+    // Any addresses without a port will have a port assigned to them.
+    repeated string addresses = 2;
+
+    // The default port to use for addresses that do not have a specified port.
+    // It will also be the port opened by UPnP.
+    //
+    // If 0, a random port will be used.
+    // Using a random port is not recommended because it will cause port churn across reconnects.
+    // Keeping the port consistent across reconnects is useful because external clients will be able to more reliably reach the client.
+    //
+    // A port >= 1024 is recommended to avoid permission denied errors from the OS.
+    uint32 default_port = 3;
+
+    // Whether to disable probing the machine for IPs to advertise.
+    // It does not advertise private IPs unless advertise_private_ips is true.
+    bool disable_probe_ips_to_advertise = 4;
+
+    // Whether to advertise private IPs (like 192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8).
+    // Has no effect if probe_ips_to_advertise is false.
+    // This only makes sense when multiple clients are on the same LAN or VPN.
+    bool advertise_private_ips = 5;
+
+    // Whether to disable public IP discovery via the server.
+    // By default, the client will try to discover its public IP by asking the server for it.
+    bool disable_public_ip_discovery = 6;
+
+    // Whether to disable UPnP.
+    bool disable_upnp = 7;
+
+    // The timeout for using UPnP.
+    // Defaults to 10 seconds.
+    // Has no effect if disable_upnp is true.
+    uint32 upnp_timeout_ms = 8;
+
+    // Whether to disable NAT hole punching
+    bool disable_nat_hole_punching = 9;
+}
+
+// TransferSettings are transfer (download and upload) settings for the client.
+message TransferSettings {
+    // The number of concurrent downloads to perform.
+    uint32 download_concurrency = 1;
+
+    // The directory to store incomplete downloads.
+    // Must be an absolute path.
+    string incomplete_download_dir = 2;
+
+    // The directory to store complete downloads.
+    // Must be an absolute path.
+    string complete_download_dir = 3;
+}
+
+message StreamEventsRequest {
+
+}
+message StreamEventsResponse {
+    // The event.
+    Event event = 1;
+
+    // The context about where the event was generated.
+    EventContext context = 2;
+}
+
+message StreamLogsRequest {
+    // Optionally, send existing logs after this timestamp before streaming live logs.
+    // The timestamp is a UNIX millisecond timestamp.
+    optional int64 send_logs_after_ts = 1;
+}
+message StreamLogsResponse {
+    // The logs.
+    // This field usually has only one log message, but in the case of
+    // sending back existing logs, it may have many.
+    // The logs will be ordered by timestamp, ascending.
+    repeated LogMessage logs = 1;
+}
+
+message StopRequest {
+
+}
+message StopResponse {
+
+}
+
+message GetClientInfoRequest {
+
+}
+message GetClientInfoResponse {
+
+}
+
+message GetServersRequest {
+
+}
+message GetServersResponse {
+    // The server records.
+    repeated ServerInfo servers = 1;
+}
+
+message CreateServerRequest {
+    // The name given to the server record.
+    string name = 1;
+
+    // The server's address.
+    string address = 2;
+
+    // The room to connect to.
+    string room = 3;
+
+    // The username to use.
+    string username = 4;
+
+    // The password to use.
+    string password = 5;
+}
+message CreateServerResponse {
+    // The newly created server record.
+    ServerInfo server = 1;
+}
+
+message DeleteServerRequest {
+    // The server's UUID.
+    string uuid = 1;
+}
+message DeleteServerResponse {
+
+}
+
+message ConnectServerRequest {
+    // The server's UUID.
+    string uuid = 1;
+}
+message ConnectServerResponse {
+
+}
+
+message DisconnectServerRequest {
+    // The server's UUID.
+    string uuid = 1;
+}
+message DisconnectServerResponse {
+
+}
+
+message UpdateServerRequest {
+    // The server's UUID.
+    string uuid = 1;
+
+    // The new name, if any.
+    optional string name = 2;
+
+    // The new address, if any.
+    optional string address = 3;
+
+    // The new room, if any.
+    optional string room = 4;
+
+    // The new username, if any.
+    optional string username = 5;
+
+    // The new password, if any.
+    optional string password = 6;
+}
+message UpdateServerResponse {
+    // The server after update.
+    ServerInfo server = 1;
+}
+
+message GetSharesRequest {
+    // The UUID of the server to get shares for.
+    string server_uuid = 1;
+}
+message GetSharesResponse {
+    // The shares.
+    repeated ShareInfo shares = 1;
+}
+
+message CreateShareRequest {
+    // The UUID of the associated server.
+    string server_uuid = 1;
+
+    // The share's name.
+    string name = 2;
+
+    // The share's path on disk.
+    string path = 3;
+
+    // Whether to follow links.
+    bool follow_links = 4;
+}
+message CreateShareResponse {
+    // The newly created share.
+    ShareInfo share = 1;
+}
+
+message DeleteShareRequest {
+    // The associated server UUID.
+    string server_uuid = 1;
+
+    // The share's name.
+    string name = 2;
+}
+message DeleteShareResponse {
+
+}
+
+message GetDirFilesRequest {
+    // The server's UUID.
+    string server_uuid = 1;
+
+    // The online user's username.
+    string username = 2;
+
+    // The path to get the contents of.
+    string path = 3;
+}
+message GetDirFilesResponse {
+    // The directory's files.
+    repeated FileMeta content = 2;
+}
+
+message GetFileMetaRequest {
+    // The server's UUID.
+    string server_uuid = 1;
+
+    // The online user's username.
+    string username = 2;
+
+    // The path to get the contents of.
+    string path = 3;
+}
+message GetFileMetaResponse {
+    // The file's metadata.
+    FileMeta meta = 1;
+}
+
+message GetOnlineUsersRequest {
+    // The server's UUID.
+    string server_uuid = 1;
+}
+message GetOnlineUsersResponse {
+    // The users.
+    repeated OnlineUserInfo users = 1;
+}
+
+message ChangeAccountPasswordRequest {
+    // The server's UUID.
+    string server_uuid = 1;
+
+    // The account's current password.
+    string current_password = 2;
+
+    // The account's new password.
+    string new_password = 3;
+}
+message ChangeAccountPasswordResponse {
+
+}
+
+message ServerConnectRequest {
+    // The server's UUID.
+    string uuid = 1;
+}
+message ServerConnectResponse {
+
+}
+
+message ServerDisconnectRequest {
+    // The server's UUID.
+    string uuid = 1;
+}
+message ServerDisconnectResponse {
+
+}
+
+message GetDirectSettingsRequest {
+
+}
+message GetDirectSettingsResponse {
+    // The client's direct connection settings.
+    DirectSettings settings = 1;
+}
+
+message UpdateDirectSettingsRequest {
+    // The settings to update.
+    // All fields must be filled.
+    DirectSettings settings = 1;
+}
+message UpdateDirectSettingsResponse {
+
+}
+
+message GetTransferSettingsRequest {
+
+}
+message GetTransferSettingsResponse {
+    // The client's transfer settings.
+    TransferSettings settings = 1;
+}
+
+message UpdateTransferSettingsRequest {
+    // The settings to update.
+    // All fields must be filled.
+    TransferSettings settings = 1;
+}
+message UpdateTransferSettingsResponse {
+
+}
+
+message IndexShareRequest {
+    // The associated server UUID.
+    string server_uuid = 1;
+
+    // The share's name.
+    string name = 2;
+}
+message IndexShareResponse {
+
+}
+
+message StreamSearchRequest {
+    // The associated server's UUID, or none to search all connected servers.
+    optional string server_uuid = 1;
+
+    // The username of the client to search, or omit to search all clients.
+    optional string username = 2;
+
+    // The search query.
+    string query = 3;
+}
+message StreamSearchResponse {
+    // The username of the client the result came from.
+    string username = 1;
+
+    // Server of origin's UUID.
+    string server_uuid = 2;
+
+    // The file's containing directory path.
+    string directory_path = 3;
+
+    // The file that was found.
+    FileMeta file = 4;
+}
+
+message GetUpdateInfoRequest {
+
+}
+message GetUpdateInfoResponse {
+    // The current update the client is running.
+    UpdateInfo current_info = 1;
+
+    // The new update's info, or no new update.
+    // This is cached info.
+    optional UpdateInfo new_info = 2;
+}
+
+message CheckForNewUpdateRequest {
+
+}
+message CheckForNewUpdateResponse {
+    // The new update's info, or no new update.
+    optional UpdateInfo new_info = 1;
+}
+
+message GetDownloadManagerItemsRequest {
+
+}
+message GetDownloadManagerItemsResponse {
+    // The download manager items.
+    repeated DownloadManagerItem items = 1;
+}
+
+message QueueFileDownloadRequest {
+    // The UUID of the server the peer exists on.
+    string server_uuid = 1;
+
+    // The peer's username.
+    string peer_username = 2;
+
+    // The path of the file within the peer.
+    string file_path = 3;
+}
+message QueueFileDownloadResponse {
+
+}
+
+message CancelFileDownloadRequest {
+    // The file download's UUID.
+    string uuid = 1;
+}
+message CancelFileDownloadResponse {
+
+}
+
+message RemoveDownloadManagerItemRequest {
+    // The item's UUID.
+    string uuid = 1;
+}
+message RemoveDownloadManagerItemResponse {
+
+}
+
+message ResumeFileDownloadRequest {
+    // The item's UUID.
+    string uuid = 1;
+}
+message ResumeFileDownloadResponse {
+
+}
+
+// ClientRpcService provides an RPC interface to a running FriendNet client.
+// It can query state and perform actions.
+//
+// If authorization is required but not provided, returns status code UNAUTHENTICATED.
+// If authorization is invalid, returns PERMISSION_DENIED status code.
+service ClientRpcService {
+    // StreamLogs returns an ongoing stream of log messages from the client.
+    rpc StreamLogs(StreamLogsRequest) returns (stream StreamLogsResponse) {}
+
+    // StreamEvents returns an ongoing stream of events from the client.
+    rpc StreamEvents(StreamEventsRequest) returns (stream StreamEventsResponse) {}
+
+    // Stop shuts down the client.
+    rpc Stop(StopRequest) returns (StopResponse) {}
+
+    // GetClientInfo returns information about the FriendNet client.
+    rpc GetClientInfo(GetClientInfoRequest) returns (GetClientInfoResponse) {}
+
+    // GetServers returns a list of all servers.
+    rpc GetServers(GetServersRequest) returns (GetServersResponse) {}
+
+    // CreateServer creates a new server and automatically connects to it.
+    rpc CreateServer(CreateServerRequest) returns (CreateServerResponse) {}
+
+    // DeleteServer disconnects and deletes a server.
+    //
+    // Returns NOT_FOUND if no such server exists.
+    rpc DeleteServer(DeleteServerRequest) returns (DeleteServerResponse) {}
+
+    // ConnectServer connects to an existing server.
+    // The server will reconnect automatically until DisconnectServer is called.
+    // No-op if the server is already connected.
+    //
+    // Returns NOT_FOUND if no such server exists.
+    rpc ConnectServer(ConnectServerRequest) returns (ConnectServerResponse) {}
+
+    // DisconnectServer disconnects from an existing server.
+    // The server will not reconnect until ConnectServer is called.
+    // No-op if the server is already disconnected.
+    //
+    // Returns NOT_FOUND if no such server exists.
+    rpc DisconnectServer(DisconnectServerRequest) returns (DisconnectServerResponse) {}
+
+    // UpdateServer updates server info.
+    // Does not disconnect the server connection if any, so disconnection then reconnection is required for changes to take effect.
+    //
+    // Returns NOT_FOUND if no such server exists.
+    rpc UpdateServer(UpdateServerRequest) returns (UpdateServerResponse) {}
+
+    // GetShares returns shares for a server.
+    //
+    // Returns NOT_FOUND if no such server exists.
+    rpc GetShares(GetSharesRequest) returns (GetSharesResponse) {}
+
+    // CreateShare creates a new server share.
+    //
+    // Returns NOT_FOUND if no such server exists.
+    // Returns INVALID_ARGUMENT if the share name is invalid.
+    // Returns ALREADY_EXISTS if a share with the same name already exists.
+    rpc CreateShare(CreateShareRequest) returns (CreateShareResponse) {}
+
+    // DeleteShare deletes an existing server share.
+    //
+    // Returns NOT_FOUND if no such server exists.
+    // Returns NOT_FOUND if no such share exists.
+    rpc DeleteShare(DeleteShareRequest) returns (DeleteShareResponse) {}
+
+    // GetDirFiles requests the files within a directory shared by an online user.
+    // Each message will contain files within the path.
+    //
+    // Returns INVALID_ARGUMENT if the path is not a directory.
+    // Returns NOT_FOUND if no such server exists.
+    // Returns NOT_FOUND if no such path exists.
+    // Returns UNAVAILABLE if the user is offline or otherwise cannot be reached.
+    rpc GetDirFiles(GetDirFilesRequest) returns (stream GetDirFilesResponse) {}
+
+    // GetFileMeta returns metadata about a path shared by an online user.
+    //
+    // Returns NOT_FOUND if no such server exists.
+    // Returns NOT_FOUND if no such path exists.
+    // Returns UNAVAILABLE if the user is offline or otherwise cannot be reached.
+    rpc GetFileMeta(GetFileMetaRequest) returns (GetFileMetaResponse) {}
+
+    // GetOnlineUsers returns a list of online users in a server.
+    //
+    // Returns NOT_FOUND if no such server exists.
+    rpc GetOnlineUsers(GetOnlineUsersRequest) returns (stream GetOnlineUsersResponse) {}
+
+    // ChangeAccountPassword changes the password for a server account.
+    // It requests that the server update the password, as opposed to just changing which password to log in with.
+    // If you only want to update which password to log in with, use UpdateServer instead.
+    //
+    // If successful, this call updates the password to log in with, so a call to UpdateServer is not necessary.
+    //
+    // Returns NOT_FOUND if no such server exists.
+    // Returns INVALID_ARGUMENT if the new password was not allowed (too short, too long, etc.).
+    // Returns PERMISSION_DENIED if the current password was incorrect.
+    rpc ChangeAccountPassword(ChangeAccountPasswordRequest) returns (ChangeAccountPasswordResponse) {}
+
+    // ServerConnect tries to connect to a server immediately.
+    // If the server was previously disconnected and reconnect was disabled, reconnect will be enabled.
+    //
+    // Returns NOT_FOUND if no such server exists.
+    rpc ServerConnect(ServerConnectRequest) returns (ServerConnectResponse) {}
+
+    // ServerDisconnect disconnects from a server.
+    // Reconnect will be disabled until ServerConnect is called on the server.
+    //
+    // Returns NOT_FOUND if no such server exists.
+    rpc ServerDisconnect(ServerDisconnectRequest) returns (ServerDisconnectResponse) {}
+
+    // GetDirectSettings returns the client's direct connection settings.
+    // The settings may not have taken effect yet if UpdateDirectSettings was called previously without restarting.
+    rpc GetDirectSettings(GetDirectSettingsRequest) returns (GetDirectSettingsResponse) {}
+
+    // UpdateDirectSettings updates the client's direct connection settings.
+    // Changes will not take effect until the client is restarted.
+    // All fields must be filled, default values will not be omitted.
+    rpc UpdateDirectSettings(UpdateDirectSettingsRequest) returns (UpdateDirectSettingsResponse) {}
+
+    // GetTransferSettings returns the client's transfer settings.
+    // Some of the settings take effect immediately, others do not.
+    rpc GetTransferSettings(GetTransferSettingsRequest) returns (GetTransferSettingsResponse) {}
+
+    // UpdateTransferSettings updates the client's transfer settings.
+    // Some of the settings take effect immediately, others do not.
+    // All fields must be filled, default values will not be omitted.
+    rpc UpdateTransferSettings(UpdateTransferSettingsRequest) returns (UpdateTransferSettingsResponse) {}
+
+    // IndexShare requests that a share be indexed.
+    // The share will be scheduled to be indexed in the background.
+    //
+    // Returns NOT_FOUND if no such server exists.
+    // Returns NOT_FOUND if no such share exists.
+    // Returns FAILED_PRECONDITION if the share does not have indexing enabled.
+    rpc IndexShare(IndexShareRequest) returns (IndexShareResponse) {}
+
+    // StreamSearch requests to search a specific client or all clients.
+    // It streams the results as they come in.
+    //
+    // Returns NOT_FOUND if no such server exists.
+    // Returns INVALID_ARGUMENT if the search query is empty.
+    // Returns UNAVAILABLE if the user is offline or otherwise cannot be reached (if a specific client was specified).
+    rpc StreamSearch(StreamSearchRequest) returns (stream StreamSearchResponse) {}
+
+    // GetUpdateInfo returns information about the client's current update, and information about any new update that
+    // is available. The new update info is cached and updated periodically.
+    //
+    // To check for a new update, call CheckForNewUpdate.
+    rpc GetUpdateInfo(GetUpdateInfoRequest) returns (GetUpdateInfoResponse) {}
+
+    // CheckForNewUpdate proactively checks for a new update and returns when either a new update is found or it is
+    // confirmed that there is no new update.
+    // The cache is updated after calling this method.
+    rpc CheckForNewUpdate(CheckForNewUpdateRequest) returns (CheckForNewUpdateResponse) {}
+
+    // GetDownloadManagerItems returns all download manager items.
+    rpc GetDownloadManagerItems(GetDownloadManagerItemsRequest) returns (GetDownloadManagerItemsResponse) {}
+
+    // QueueFileDownload queues a file download.
+    //
+    // Returns NOT_FOUND if no such server exists.
+    rpc QueueFileDownload(QueueFileDownloadRequest) returns (QueueFileDownloadResponse) {}
+
+    // CancelFileDownload cancels a file download.
+    //
+    // Returns NOT_FOUND if no such download exists.
+    rpc CancelFileDownload(CancelFileDownloadRequest) returns (CancelFileDownloadResponse) {}
+
+    // RemoveDownloadManagerItem removes a download manager item.
+    // It does not delete anything on disk.
+    //
+    // Returns NOT_FOUND if no such item exists.
+    rpc RemoveDownloadManagerItem(RemoveDownloadManagerItemRequest) returns (RemoveDownloadManagerItemResponse) {}
+
+    // ResumeFileDownload resumes or starts the a file download.
+    //
+    // Returns NOT_FOUND if no such download exists.
+    rpc ResumeFileDownload(ResumeFileDownloadRequest) returns (ResumeFileDownloadResponse) {}
+}

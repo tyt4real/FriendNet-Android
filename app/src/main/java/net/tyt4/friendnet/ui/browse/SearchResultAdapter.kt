@@ -31,12 +31,6 @@ class SearchResultAdapter(
             item.username,
             if (directory.isEmpty()) "/" else directory
         )
-        if (item.snippet.isNotBlank()) {
-            holder.binding.textSnippet.text = item.snippet
-            holder.binding.textSnippet.visibility = android.view.View.VISIBLE
-        } else {
-            holder.binding.textSnippet.visibility = android.view.View.GONE
-        }
 
         holder.itemView.setOnClickListener { onClick(item) }
     }
