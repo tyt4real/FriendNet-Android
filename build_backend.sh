@@ -41,11 +41,6 @@ fi
 
 cd FriendNet
 
-# The upnp module upstream excludes Android (//go:build !android). Inject a
-# minimal shim so the client compiles for GOOS=android, then remove it after
-# building so the submodule stays pristine.
-UPNP_SHIM="upnp/interfaces_android.go"
-
 # The upstream webserver only enables HTTP/2 over TLS (protos.SetHTTP2), not
 # cleartext h2c (protos.SetUnencryptedHTTP2). The app's gRPC client (OkHttp)
 # speaks HTTP/2 with prior knowledge over a plaintext unix socket, which
@@ -58,33 +53,8 @@ if ! grep -q "SetUnencryptedHTTP2" "$WEBSERVER_FILE"; then
     WEBSERVER_PATCHED=1
     echo "Patched $WEBSERVER_FILE for cleartext h2c support"
 fi
-UPNP_SHIM_INJECTED=0
-if [ -f "$UPNP_SHIM" ]; then
-    echo "Note: $UPNP_SHIM already exists; leaving it in place."
-else
-    cat > "$UPNP_SHIM" <<'SHIMEOF'
-//go:build android
-
-package upnp
-
-import "net"
-
-func listInterfaces() ([]net.Interface, error) {
-	return net.Interfaces()
-}
-
-func interfaceAddrsByInterface(intf *net.Interface) ([]net.Addr, error) {
-	return intf.Addrs()
-}
-SHIMEOF
-    UPNP_SHIM_INJECTED=1
-fi
 
 cleanup() {
-    if [ "$UPNP_SHIM_INJECTED" = "1" ] && [ -f "$UPNP_SHIM" ]; then
-        rm -f "$UPNP_SHIM"
-        echo "Removed injected $UPNP_SHIM"
-    fi
     if [ "$WEBSERVER_PATCHED" = "1" ]; then
         git checkout -- "$WEBSERVER_FILE"
         echo "Restored $WEBSERVER_FILE"
